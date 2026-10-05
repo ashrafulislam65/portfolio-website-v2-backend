@@ -1,0 +1,116 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection (used by the running API)
+  directUrl = env("DIRECT_URL")   // direct connection (used by db:push / migrations)
+}
+
+model Admin {
+  id           Int    @id @default(autoincrement())
+  email        String @unique
+  passwordHash String
+}
+
+// Single row (id = 1)
+model Profile {
+  id       Int      @id @default(1)
+  name     String
+  title    String
+  roles    String[]
+  tagline  String
+  bio      String
+  photo    String   @default("")
+  email    String
+  phone    String   @default("")
+  location String   @default("")
+  github   String   @default("")
+  linkedin String   @default("")
+  whatsapp String   @default("")
+  resume   String   @default("")
+  status   String   @default("Open to work")
+}
+
+// Title, order and visibility of every block on the page.
+// Built-in keys: about, skills, projects, experience, blogs, contact, github. Any other key is a custom text section.
+model Section {
+  id       Int     @id @default(autoincrement())
+  key      String  @unique
+  title    String
+  subtitle String  @default("")
+  body     String  @default("")
+  visible  Boolean @default(true)
+  order    Int     @default(0)
+}
+
+model Stat {
+  id      Int     @id @default(autoincrement())
+  label   String
+  value   Int
+  visible Boolean @default(true)
+  order   Int     @default(0)
+}
+
+model Skill {
+  id      Int     @id @default(autoincrement())
+  group   String
+  name    String
+  level   Int
+  source  String  @default("manual") // "manual" or "github" (percentage comes from your repos)
+  icon    String  @default("")       // optional devicon slug, e.g. "nextjs". Empty = guess from name
+  visible Boolean @default(true)
+  order   Int     @default(0)
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String   @default("")
+  year        String   @default("")
+  featured    Boolean  @default(false)
+  description String
+  image       String   @default("")
+  tags        String[]
+  live        String   @default("")
+  repo        String   @default("")
+  visible     Boolean  @default(true)
+  order       Int      @default(0)
+}
+
+model Experience {
+  id      Int      @id @default(autoincrement())
+  role    String
+  org     String
+  period  String
+  points  String[]
+  visible Boolean  @default(true)
+  order   Int      @default(0)
+}
+
+model Post {
+  id      Int     @id @default(autoincrement())
+  title   String
+  date    String
+  summary String
+  link    String  @default("")
+  visible Boolean @default(true)
+  order   Int     @default(0)
+}
+
+model Setting {
+  key   String @id
+  value Json
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String   @default("")
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

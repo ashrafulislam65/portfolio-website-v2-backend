@@ -1,0 +1,5 @@
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
+  "functions": { "api/index.ts": { "maxDuration": 60, "includeFiles": "prisma/**" } },
+  "crons": [{ "path": "/api/cron/github", "schedule": "0 3 * * *" }]
+}
