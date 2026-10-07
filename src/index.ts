@@ -14,7 +14,10 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map((x) => x.trim()) }));
+const origins = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map((x) => x.trim().replace(/\/+$/, ''));
+app.use(cors({
+  origin: (o, cb) => cb(null, !o || origins.includes(o) || (!process.env.VERCEL && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(o))),
+}));
 app.use(express.json({ limit: '1mb' }));
 
 const loginLimiter = rateLimit({ windowMs: 10 * 60_000, limit: 10, message: { error: 'Too many attempts. Try again later.' } });
